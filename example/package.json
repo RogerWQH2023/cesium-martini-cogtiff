@@ -19,7 +19,8 @@
   "license": "MIT",
   "dependencies": {
     "@zjugis/cesium-martini": "workspace:^",
-    "cesium": "^1.113.0"
+    "cesium": "^1.113.0",
+    "tiff-imagery-provider": "^2.10.1"
   },
   "devDependencies": {
     "typescript": "^5.3.3",
