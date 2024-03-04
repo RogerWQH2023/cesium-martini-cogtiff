@@ -23,6 +23,9 @@ importers:
       cesium:
         specifier: ^1.113.0
         version: 1.113.0
+      geotiff:
+        specifier: ^2.1.3
+        version: 2.1.3
       tiff-imagery-provider:
         specifier: ^2.10.1
         version: 2.10.1(cesium@1.113.0)
@@ -39,9 +42,15 @@ importers:
 
   packages/cesium-martini:
     dependencies:
+      geotiff:
+        specifier: ^2.1.3
+        version: 2.1.3
       ndarray:
         specifier: ^1.0.19
         version: 1.0.19
+      tiff-imagery-provider:
+        specifier: ^2.10.1
+        version: 2.10.1(cesium@1.113.0)
     devDependencies:
       '@surma/rollup-plugin-off-main-thread':
         specifier: ^2.2.3
