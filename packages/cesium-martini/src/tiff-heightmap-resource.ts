@@ -105,8 +105,17 @@ export class DefaultTiffHeightmapResource implements HeightmapResource {
 
   getTilePixels = async (coords: TileCoordinates) => {
     //const img = await this.loadImage(coords);
-    const img = await this.resource.requestImage(coords.x, coords.y, coords.z);
-    return this.getPixels(img);
+    //const img = await this.resource.requestImage(coords.x, coords.y, coords.z);
+    //console.log(this.getPixels(img));
+    //return this.getPixels(img);
+    //这里使用了(myObject as any).privateMethod();的格式强行调用了私有的_loadTile()方法，加载瓦片
+    const img = await (this.resource as any)._loadTile(
+      coords.x,
+      coords.y,
+      coords.z
+    );
+    //console.log(img);
+    return img;
   };
 
   getTileDataAvailable({ z }: { z: number }) {

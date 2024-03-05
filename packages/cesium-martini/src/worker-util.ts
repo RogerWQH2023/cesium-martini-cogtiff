@@ -2,7 +2,7 @@
 //const canvas = new OffscreenCanvas(256, 256);
 //const ctx = canvas.getContext("2d");
 
-import ndarray, { NdArray } from "ndarray";
+import ndarray, { NdArray, TypedArray } from "ndarray";
 import Martini from "./martini";
 
 function mapboxTerrainToGrid(
@@ -144,7 +144,11 @@ export interface QuantizedMeshOptions {
   ellipsoidRadius: number;
 }
 
-function createQuantizedMeshData(tile: any, mesh: any, tileSize: number): TerrainWorkerOutput {
+function createQuantizedMeshData(
+  tile: any,
+  mesh: any,
+  tileSize: number
+): TerrainWorkerOutput {
   const xvals = [];
   const yvals = [];
   const heightMeters = [];
@@ -207,7 +211,7 @@ function createQuantizedMeshData(tile: any, mesh: any, tileSize: number): Terrai
   };
 }
 export interface TerrainWorkerInput extends QuantizedMeshOptions {
-  imageData: Uint8ClampedArray;
+  imageData: TypedArray;
   maxLength: number | null;
   x: number;
   y: number;
@@ -227,19 +231,45 @@ export interface TerrainWorkerInput extends QuantizedMeshOptions {
 let martini: Martini;
 
 function decodeTerrain(parameters: TerrainWorkerInput) {
-  const { imageData, tileSize = 256, errorLevel, interval, offset } = parameters;
+  const {
+    imageData,
+    tileSize = 256,
+    errorLevel,
+    interval,
+    offset,
+  } = parameters;
 
-  const pixels = ndarray(
+  /* const pixels = ndarray(
     new Uint8Array(imageData),
     [tileSize, tileSize, 4],
     [4, 4 * tileSize, 1],
     0
-  );
+  ); */
 
   // Tile size must be maintained through the life of the worker
   martini ??= new Martini(tileSize + 1);
+  console.log(imageData[0]);
 
-  const terrain = mapboxTerrainToGrid(pixels, interval, offset);
+  //const terrain = mapboxTerrainToGrid(pixels, interval, offset);
+
+  const gridSize = tileSize + 1;
+  const terrain = new Float32Array(gridSize * gridSize);
+
+  // decode terrain values
+  for (let y = 0; y < tileSize; y++) {
+    for (let x = 0; x < tileSize; x++) {
+      terrain[y * gridSize + x] = imageData[0][y * tileSize + x] * 1.5;
+    }
+  }
+  // backfill right and bottom borders
+  for (let x = 0; x < gridSize - 1; x++) {
+    terrain[gridSize * (gridSize - 1) + x] =
+      terrain[gridSize * (gridSize - 2) + x];
+  }
+  for (let y = 0; y < gridSize; y++) {
+    terrain[gridSize * y + gridSize - 1] = terrain[gridSize * y + gridSize - 2];
+  }
+  console.log(terrain);
 
   const tile = martini.createTile(terrain);
 

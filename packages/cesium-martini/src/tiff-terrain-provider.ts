@@ -19,6 +19,7 @@ import DefaultTiffHeightmapResource, {
   HeightmapResource,
 } from "./tiff-heightmap-resource";
 import { emptyMesh, TerrainWorkerOutput } from "./worker-util";
+import { TypedArray } from "ndarray";
 
 // https://github.com/CesiumGS/cesium/blob/1.68/Source/Scene/MapboxImageryProvider.js#L42
 
@@ -154,15 +155,21 @@ export default class TiffMartiniTerrainProvider {
       const { tileSize, getTilePixels } = this.resource;
       let px = await getTilePixels({ x, y, z });
       if (!px) throw Error("no pixels at " + `x: ${x}, y: ${y}, z: ${z}`);
-      console.log(px);
-      let pixelData: Uint8ClampedArray | undefined = px.data;
+      //console.log(px);
+      let pixelData: TypedArray | undefined = px.data;
+      console.log(pixelData);
+      console.log(pixelData.buffer);
+      //console.log(this.tilingScheme);
 
       const tileRect = this.tilingScheme.tileXYToRectangle(x, y, z);
+      //console.log(1);
       ///const center = Rectangle.center(tileRect);
 
       const err = this.errorAtZoom(z);
+      //console.log(2);
 
       let maxLength = this.maxVertexDistance(tileRect);
+      //console.log(3);
 
       const params: TerrainWorkerInput = {
         imageData: pixelData,
@@ -178,11 +185,15 @@ export default class TiffMartiniTerrainProvider {
       };
 
       let res;
-      if (this.workerFarm != null) {
+      /* if (this.workerFarm != null) {
+        console.log(4);
+        console.log(pixelData.buffer);
         res = await this.workerFarm.scheduleTask(params, [pixelData.buffer]);
-      } else {
-        res = decodeTerrain(params);
-      }
+      } else { */
+      console.log(5);
+      res = decodeTerrain(params);
+      //}
+
       pixelData = undefined;
       px = undefined;
       return this.createQuantizedMeshData(tileRect, err, res);
