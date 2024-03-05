@@ -1,5 +1,4 @@
 # 笔记、更改想法、更改日志
-由于函数太多了，脑子里记不过来，所以写一些日志
 ## 记录
 - terrainProvider本体：*terrain-provider.ts*
   - 读取数据：*heightmap-resource.ts*（在terrainProvider开头进行，此阶段读进来的是未加工的RGB数据）
